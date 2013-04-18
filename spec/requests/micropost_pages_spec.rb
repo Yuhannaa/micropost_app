@@ -42,4 +42,43 @@ describe "MicropostPages" do
       end
     end
   end
+
+  describe "micropost pagination" do
+    before do
+      50.times { FactoryGirl.create(:micropost, user: user) }
+      visit root_path
+    end
+
+    it { should have_selector('div.pagination') }
+
+    it "should list each micropost" do
+      user.feed.paginate(page: 1).each do |item|
+        expect(page).to have_selector("li##{item.id}", text: item.content)
+      end
+    end
+  end
+
+  describe "delete links" do
+
+    describe "for microposts created by the current user" do
+      let!(:micropost) { FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum") }
+      before do
+        visit user_path(user)
+      end
+
+      it { should have_selector("span.content", text: "Lorem ipsum") }
+      it { should have_link('delete', href: micropost_path(micropost)) }
+    end
+
+    describe "for microposts created by the another user" do
+      let(:another_user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: another_user, content: "Lorem ipsum")
+        visit user_path(another_user)
+      end
+
+      it { should have_selector("span.content", text: "Lorem ipsum") }
+      it { should_not have_link('delete') }      
+    end
+  end
 end

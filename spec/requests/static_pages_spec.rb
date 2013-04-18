@@ -19,17 +19,26 @@ describe "Static pages" do
 
     describe "for signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
-      before do
-        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
-        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
-        sign_in user
-        visit root_path
-      end
+      before { sign_in user }
 
       it "should render the user's feed" do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        visit root_path
+
         user.feed.each do |item|
           expect(page).to have_selector("li##{item.id}", text: item.content)
         end
+      end
+
+      it "should have the sidebar including proper pluralization" do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        visit root_path
+        expect(page).to have_selector("span", text: "1 micropost")
+
+        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        visit root_path
+        expect(page).to have_selector("span", text: "2 microposts")
       end
     end
   end

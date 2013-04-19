@@ -8,6 +8,7 @@ gem 'faker', '1.1.2'
 gem 'will_paginate', '3.0.4'
 gem 'bootstrap-will_paginate', '0.0.9'
 gem 'pg', '0.14.1'
+gem 'twitter-text'
 
 group :development, :test do
   gem 'sqlite3', '1.3.7'
